@@ -39,6 +39,8 @@ function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_pa
 {
   require_once $p_wrapper_path . 'WrapperSoap.php';
   require_once $p_class_path . 'SoapSMSModel.php';
+  require_once $p_class_path . 'XmlParser.php';
+  require_once $p_class_path . 'Validate.php';
 
   $f_obj_soap_client_handle = null;
   $f_obj_soap_wrapper = new WrapperSoap();
@@ -56,11 +58,37 @@ function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_pa
     $f_obj_download_details->set_soap_client_handle($f_obj_soap_client_handle);
     $f_arr_sms_messages = $f_obj_download_details->get_sms_messages();
     
-    $f_arr_split_sms_messages = [];
+    $m_arr_parsed_sms_messages = [];
+    $f_arr_parsed_sms_messages = [];
+
+    $f_obj_xml_parser =  new XmlParser();
+    $f_obj_validate =  new Validate();
+    
     foreach($f_arr_sms_messages as $f_index => $f_value)
     { 
-      array_push($f_arr_split_sms_messages, splitMessage($f_value));
+        $f_obj_xml_parser->set_xml_string_to_parse($f_value);
+        $f_obj_xml_parser->parse_the_xml_string();                  // Parsing
+        $m_parsed_arr = $f_obj_xml_parser->get_parsed_data();
+
+        foreach($m_parsed_arr as $f_index => $f_value)
+        { 
+            $f_value = $f_obj_validate->sanitise_string($f_value); // Sanitising
+        }
+
+        array_push($m_arr_parsed_sms_messages, $m_parsed_arr);
     }
+
+    foreach($m_arr_parsed_sms_messages as $f_arr_sms) {  // For each of the arrays
+        if(strpos($f_arr_sms['message'], 'id":"ccl') !== false) { // If the message contains ccl then
+            $f_arr_sms['message'] = json_decode($f_arr_sms['message'], true);
+            if (json_last_error() === JSON_ERROR_NONE) {    // Validating that string was of JSON format
+                array_push($f_arr_parsed_sms_messages, $f_arr_sms);  // Thats our message so push it onto our array
+            }
+            
+        }
+    }
+
+    print_r($f_arr_parsed_sms_messages);
   }
   $f_page_heading_2 = 'Showing download SMS messages';
   $f_page_text  = '...';
@@ -77,30 +105,10 @@ function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_pa
       'page_heading_1' => $f_application_name,
       'page_heading_2' => $f_page_heading_2,
       'page_text' => $f_page_text,
-      'sms_message' => $f_arr_split_sms_messages
+      'sms_message' => $f_arr_parsed_sms_messages
   ];
 
   return $arr_data;
-}
-
-function splitMessage($p_messagerx) {
-  $f_sourcemsisdn = implode(preg_split("/.*\<(sourcemsisdn)\>|\<(\/sourcemsisdn).*/", $p_messagerx, -1, PREG_SPLIT_NO_EMPTY));
-  $f_destinationmsisdn = implode(preg_split("/.*\<(destinationmsisdn)\>|\<(\/destinationmsisdn).*/", $p_messagerx, -1, PREG_SPLIT_NO_EMPTY));
-  $f_receivedtime = implode(preg_split("/.*\<(receivedtime)\>|\<(\/receivedtime).*/", $p_messagerx, -1, PREG_SPLIT_NO_EMPTY));
-  $f_bearer = implode(preg_split("/.*\<(bearer)\>|\<(\/bearer).*/", $p_messagerx, -1, PREG_SPLIT_NO_EMPTY));
-  $f_messageref = implode(preg_split("/.*\<(messageref)\>|\<(\/messageref).*/", $p_messagerx, -1, PREG_SPLIT_NO_EMPTY));
-  $f_message = implode(preg_split("/.*\<(message)\>|\<(\/message).*/", $p_messagerx, -1, PREG_SPLIT_NO_EMPTY));
-
-  $f_arr_message = [
-      'sourcemsidn' => $f_sourcemsisdn,
-      'desinationmsidn' => $f_destinationmsisdn,
-      'receivedtime' => $f_receivedtime,
-      'bearer' => $f_bearer,
-      'messageref' => $f_messageref,
-      'message' => $f_message
-  ];
-
-  return $f_arr_message;
 }
 
 function feature_error()

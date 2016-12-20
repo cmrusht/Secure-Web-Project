@@ -14,8 +14,20 @@
   { 
     echo "<tr>";
 
-    foreach($sms_arr as $f_index => $f_value) {
-        echo "<td>" . $f_value . "</td>";
+      foreach($sms_arr as $f_index => $f_value) {
+
+        if ($f_index == 'message') {
+          echo "<td>";
+          foreach($f_value as $m_index => $m_value) {
+            echo $m_index . " -> " . $m_value;
+            echo "<br>";
+          }
+          echo "</td>";
+        }
+        else {
+          echo "<td>" . $f_value . "</td>";
+        }
+        
     }
 
     echo "</tr>";

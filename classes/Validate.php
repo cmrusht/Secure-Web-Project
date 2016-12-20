@@ -6,6 +6,13 @@ class Validate
 
 	public function __destruct() { }
 
+	public function sanitise_string($p_string_to_sanitise)
+	{
+		
+			$m_sanitised_string = filter_var($p_string_to_sanitise, FILTER_SANITIZE_STRING);
+		return $m_sanitised_string;
+	}
+
 	public function validate_feature($p_type_to_check, $p_arr_features)
 	{
 		$m_checked_server_type = false;

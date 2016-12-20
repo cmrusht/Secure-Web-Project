@@ -21,8 +21,9 @@ class SoapSMSModel
 
   public function get_sms_messages()
   {
-    $c_downloaded_sms = $this->c_obj_soap_client_handle->peekMessages("16craigd", "Craggz123", 20, "");
+    $c_downloaded_sms = $this->c_obj_soap_client_handle->peekMessages("16craigd", "Craggz123", 30, "");
     
     return $c_downloaded_sms;
   }
+
 }
