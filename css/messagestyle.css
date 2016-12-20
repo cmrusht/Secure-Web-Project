@@ -1,0 +1,14 @@
+html {margin:0;padding:0;border:0;}
+
+table.smstable {
+    border: 1px solid black;
+
+}
+
+table.smstable tr {
+    padding: 10px;
+}
+
+table.smstable td {
+    border: 1px solid black;
+}

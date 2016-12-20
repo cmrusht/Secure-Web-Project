@@ -1,0 +1,23 @@
+<h2><?php echo $page_heading_2?></h2>
+<p><?php echo $page_text ?></p>
+<?php echo "<table class='smstable'>
+  <tr>
+    <td>Source</td>
+    <td>Destination</td>
+    <td>Received</td>
+    <td>Bearer</td>
+    <td>Message Reference</td>
+    <td>Message</td>
+  </tr>";
+
+  foreach($sms_message as $sms_arr)
+  { 
+    echo "<tr>";
+
+    foreach($sms_arr as $f_index => $f_value) {
+        echo "<td>" . $f_value . "</td>";
+    }
+
+    echo "</tr>";
+  }
+echo "</table>";?>
