@@ -33,22 +33,23 @@ class WrapperMySQL
 		return $this->c_obj_pdo;
 	}
 
-	public function safe_query($p_query_string, $p_arr_query_parameters = null)
+	public function safe_query($p_query_string, $p_arr_query_parameters = false)
 	{
 		$m_query_success = false;
 		try
-		{
+		{	
 			$m_temp = array();
 
 			$this->c_obj_stmt = $this->c_obj_pdo->prepare($p_query_string);
 
 			// bind the parameters
-			if (sizeof($p_arr_query_parameters) > 0)
+			if (sizeof($p_arr_query_parameters) > 0 && $p_arr_query_parameters != NULL)
 			{
 				foreach ($p_arr_query_parameters as $m_param_key => $m_param_value)
-				{
+				{	
 					$m_temp[$m_param_key] = $m_param_value;
 					$this->c_obj_stmt->bindParam($m_param_key, $m_temp[$m_param_key], PDO::PARAM_STR);
+					
 				}
 			}
 			// execute the query
@@ -66,6 +67,16 @@ class WrapperMySQL
 		}
 		return $m_query_success;
 	}
+
+	private function check_db_sms_dupe() {
+
+
+	}
+
+
+
+
+
 
 	public function count_rows()
 	{

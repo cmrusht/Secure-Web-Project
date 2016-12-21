@@ -6,8 +6,10 @@
     <td>Destination</td>
     <td>Received</td>
     <td>Bearer</td>
-    <td>Message Reference</td>
+    <td>Message Hash</td>
+    <td>Message ID</td>
     <td>Message</td>
+    <td>Message TimeStamp</td>
   </tr>";
 
   foreach($sms_message as $sms_arr)
@@ -17,12 +19,9 @@
       foreach($sms_arr as $f_index => $f_value) {
 
         if ($f_index == 'message') {
-          echo "<td>";
           foreach($f_value as $m_index => $m_value) {
-            echo $m_index . " -> " . $m_value;
-            echo "<br>";
+            echo "<td>" . $m_value . "</td>";
           }
-          echo "</td>";
         }
         else {
           echo "<td>" . $f_value . "</td>";

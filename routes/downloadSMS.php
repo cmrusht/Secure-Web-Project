@@ -38,6 +38,8 @@ function validation($p_feature, $p_class_path, $p_arr_features)
 function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_path)
 {
   require_once $p_wrapper_path . 'WrapperSoap.php';
+  require_once $p_wrapper_path . 'WrapperMySQL.php';
+  require_once $p_wrapper_path . 'WrapperSQL.php';
   require_once $p_class_path . 'SoapSMSModel.php';
   require_once $p_class_path . 'XmlParser.php';
   require_once $p_class_path . 'Validate.php';
@@ -88,7 +90,41 @@ function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_pa
         }
     }
 
-    print_r($f_arr_parsed_sms_messages);
+    $f_obj_mysql_wrapper = new WrapperMySQL();
+    $f_obj_sql_wrapper = new WrapperSQL();
+    $f_obj_pdo = $f_obj_mysql_wrapper->connect_to_database();
+
+    
+    foreach($f_arr_parsed_sms_messages as $sms_arr)
+    {   
+        
+        $f_obj_mysql_wrapper->safe_query($f_obj_sql_wrapper->check_dupe_message($sms_arr['message']['hashid']));
+        if ($f_obj_mysql_wrapper->count_rows() == 0) {
+
+            $f_arr_sql_param = [];
+            $f_arr_sql_key = array('source', 'destination', 'received', 'bearer', 'message_hash', 'message_id', 'message', 'message_timestamp');
+            $i = 0;
+            foreach($sms_arr as $f_index => $f_value) {
+
+                if ($f_index == 'message') {
+                    foreach($f_value as $m_index => $m_value) {
+                        $f_arr_sql_param[$f_arr_sql_key[$i]] = $m_value;
+                        $i++;
+                    }
+                }
+                else {
+                    $f_arr_sql_param[$f_arr_sql_key[$i]] = $f_value;
+                    $i++;
+                }
+            }
+
+            print_r($f_arr_sql_param);  // Show latest message inserted into database
+
+            $f_obj_mysql_wrapper->safe_query($f_obj_sql_wrapper->store_message(), $f_arr_sql_param);
+        }
+        
+    }
+
   }
   $f_page_heading_2 = 'Showing download SMS messages';
   $f_page_text  = '...';
