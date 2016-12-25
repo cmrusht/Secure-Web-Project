@@ -16,16 +16,9 @@
   { 
     echo "<tr>";
 
-      foreach($sms_arr as $f_index => $f_value) {
+    foreach($sms_arr as $f_index => $f_value) {
 
-        if ($f_index == 'message') {
-          foreach($f_value as $m_index => $m_value) {
-            echo "<td>" . $m_value . "</td>";
-          }
-        }
-        else {
-          echo "<td>" . $f_value . "</td>";
-        }
+      echo "<td>" . $f_value . "</td>";
         
     }
 

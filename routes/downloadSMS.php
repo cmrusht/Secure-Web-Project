@@ -90,40 +90,43 @@ function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_pa
         }
     }
 
-    $f_obj_mysql_wrapper = new WrapperMySQL();
+    $f_obj_mysql_wrapper = new WrapperMySQL();  //Setting up SQL Connections and wrapper
     $f_obj_sql_wrapper = new WrapperSQL();
     $f_obj_pdo = $f_obj_mysql_wrapper->connect_to_database();
 
     
-    foreach($f_arr_parsed_sms_messages as $sms_arr)
+    foreach($f_arr_parsed_sms_messages as $sms_arr) // For every element in the message array
     {   
-        
-        $f_obj_mysql_wrapper->safe_query($f_obj_sql_wrapper->check_dupe_message($sms_arr['message']['hashid']));
-        if ($f_obj_mysql_wrapper->count_rows() == 0) {
+        // Check to see if any of ours messages have the same hash as one in the database
+        $f_obj_mysql_wrapper->safe_query($f_obj_sql_wrapper->check_dupe_message($sms_arr['message']['hashid']));    
+        if ($f_obj_mysql_wrapper->count_rows() == 0) {  // If the last query ^ returned any rows dont use that message
 
-            $f_arr_sql_param = [];
-            $f_arr_sql_key = array('source', 'destination', 'received', 'bearer', 'message_hash', 'message_id', 'message', 'message_timestamp');
-            $i = 0;
-            foreach($sms_arr as $f_index => $f_value) {
+            $f_arr_sql_param = [];  // New array for our messages
+            $f_arr_sql_key = array('source', 'destination', 'received', 'bearer', 'message_hash', 'message_id', 'message', 'message_timestamp');    // Create an array of the table fields
+            $i = 0; // Incrementer
+            foreach($sms_arr as $f_index => $f_value) { // For each of our messages 
 
-                if ($f_index == 'message') {
-                    foreach($f_value as $m_index => $m_value) {
-                        $f_arr_sql_param[$f_arr_sql_key[$i]] = $m_value;
-                        $i++;
+                if ($f_index == 'message') {    // If we are at the message data
+                    foreach($f_value as $m_index => $m_value) { // For each the message data
+                        $f_arr_sql_param[$f_arr_sql_key[$i]] = $m_value;    // Set the value correlating to the table array fields
+                        $i++;   // Increment
                     }
                 }
                 else {
-                    $f_arr_sql_param[$f_arr_sql_key[$i]] = $f_value;
+                    $f_arr_sql_param[$f_arr_sql_key[$i]] = $f_value;    // Set the value correlating to the table array fields
                     $i++;
                 }
             }
 
-            print_r($f_arr_sql_param);  // Show latest message inserted into database
+            print_r($f_arr_sql_param);  // Show latest messages ready to be inserted into database
 
-            $f_obj_mysql_wrapper->safe_query($f_obj_sql_wrapper->store_message(), $f_arr_sql_param);
+            $f_obj_mysql_wrapper->safe_query($f_obj_sql_wrapper->store_message(), $f_arr_sql_param);    // Insert our messages into the database using our new array of messages
         }
         
     }
+    
+    $f_obj_mysql_wrapper->safe_query($f_obj_sql_wrapper->get_message());
+    $f_message_record_set = $f_obj_mysql_wrapper->safe_fetch_array();
 
   }
   $f_page_heading_2 = 'Showing download SMS messages';
@@ -141,7 +144,7 @@ function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_pa
       'page_heading_1' => $f_application_name,
       'page_heading_2' => $f_page_heading_2,
       'page_text' => $f_page_text,
-      'sms_message' => $f_arr_parsed_sms_messages
+      'sms_message' => $f_message_record_set
   ];
 
   return $arr_data;

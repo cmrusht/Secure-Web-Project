@@ -68,16 +68,6 @@ class WrapperMySQL
 		return $m_query_success;
 	}
 
-	private function check_db_sms_dupe() {
-
-
-	}
-
-
-
-
-
-
 	public function count_rows()
 	{
 		$m_num_rows = $this->c_obj_stmt->rowCount();
@@ -92,7 +82,7 @@ class WrapperMySQL
 
 	public function safe_fetch_array()
 	{
-		$m_arr_row = $this->c_obj_stmt->fetch(PDO::FETCH_ASSOC);
+		$m_arr_row = $this->c_obj_stmt->fetchall(PDO::FETCH_ASSOC);
 		$this->c_obj_stmt->closeCursor();
 		return $m_arr_row;
 	}
