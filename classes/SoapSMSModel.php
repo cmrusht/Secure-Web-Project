@@ -25,5 +25,11 @@ class SoapSMSModel
     
     return $c_downloaded_sms;
   }
+  public function send_sms_message($p_message, $p_number)
+  {
+    date_default_timezone_set("Europe/London");
+    $m_message = '{"hashid":"'.$p_number.'","id":"ccl","message":"'.$p_message.'","timestamp":"'.date("d/m/Y").' '.date("H:i:s").'"}';
+    $this->c_obj_soap_client_handle->sendMessage("16craigd", "Craggz123", "7817814149", $m_message, false, "SMS");
+  }
 
 }

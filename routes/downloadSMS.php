@@ -58,6 +58,12 @@ function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_pa
   {
     $f_obj_download_details = new SoapSMSModel();
     $f_obj_download_details->set_soap_client_handle($f_obj_soap_client_handle);
+
+    if(isset($_GET['message'])) {
+        $f_obj_download_details->send_sms_message($_GET['message'], $_GET['number']);
+    }
+
+
     $f_arr_sms_messages = $f_obj_download_details->get_sms_messages();
     
     $m_arr_parsed_sms_messages = [];

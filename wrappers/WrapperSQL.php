@@ -24,7 +24,7 @@ class WrapperSQL
   public function get_message()
   {
     $m_sql_query_string  = "SELECT DISTINCT * FROM message ";
-    $m_sql_query_string .= "ORDER BY message_timestamp;";
+    $m_sql_query_string .= "ORDER BY received DESC;";
     return $m_sql_query_string;
   }
 
