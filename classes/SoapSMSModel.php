@@ -21,14 +21,14 @@ class SoapSMSModel
 
   public function get_sms_messages()
   {
-    $c_downloaded_sms = $this->c_obj_soap_client_handle->peekMessages("16craigd", "Craggz123", 100, "");
+    $c_downloaded_sms = $this->c_obj_soap_client_handle->peekMessages("16craigd", "Craggz123", 500, "");
     
     return $c_downloaded_sms;
   }
-  public function send_sms_message($p_message, $p_number)
+  public function send_sms_message($p_number, $p_s1, $p_s2, $p_s3, $p_s4, $p_fan, $p_heater, $p_keypad, $p_message)
   {
     date_default_timezone_set("Europe/London");
-    $m_message = '{"hashid":"'.$p_number.'","id":"ccl","message":"'.$p_message.'","timestamp":"'.date("d/m/Y").' '.date("H:i:s").'"}';
+    $m_message = '{"hashid":"'.$p_number.'","id":"llc","s1":"'.$p_s1.'","s2":"'.$p_s2.'","s3":"'.$p_s3.'","s4":"'.$p_s4.'","fan":"'.$p_fan.'","heater":"'.$p_heater.'","keypad":"'.$p_keypad.'","message":"'.$p_message.'"}';
     $this->c_obj_soap_client_handle->sendMessage("16craigd", "Craggz123", "7817814149", $m_message, false, "SMS");
   }
 

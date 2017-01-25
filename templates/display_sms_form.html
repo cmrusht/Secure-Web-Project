@@ -1,40 +1,124 @@
-<h2><?php echo $page_heading_2?></h2>
-<p><?php echo $page_text ?></p>
-<?php echo "<table class='smstable'>
-  <tr>
-    <td>Source</td>
-    <td>Destination</td>
-    <td>Received</td>
-    <td>Bearer</td>
-    <td>Message Hash</td>
-    <td>Message ID</td>
-    <td>Message</td>
-    <td>Message TimeStamp</td>
-  </tr>";
+<div id="content">
+  <h2><?php echo $page_heading_2?></h2>
+  <p id="page_meta"><?php echo $page_text ?></p>
+  <?php echo "<div id='smscontainer'>
+  <table class='smstable'>
+    <tr>
+      <td>Source</td>
+      <td>Destination</td>
+      <td>Received</td>
+      <td>Bearer</td>
+      <td>Message Hash</td>
+      <td>Message ID</td>
+      <td>Switch 1</td>
+      <td>Switch 2</td>
+      <td>Switch 3</td>
+      <td>Switch 4</td>
+      <td>Fan</td>
+      <td>Heater</td>
+      <td>Keypad</td>
+      <td>Update Message</td>
+    </tr>";
 
-  foreach($sms_message as $sms_arr)
-  { 
-    echo "<tr>";
+    foreach($sms_message as $sms_arr)
+    { 
+      echo "<tr>";
 
-    foreach($sms_arr as $f_index => $f_value) {
+      foreach($sms_arr as $f_index => $f_value) {
 
-      echo "<td>" . $f_value . "</td>";
-        
+        echo "<td>" . $f_value . "</td>";
+          
+      }
+
+      echo "</tr>";
     }
+  echo "</table></div>";
+  ?>
 
-    echo "</tr>";
-  }
-echo "</table>";
+  <form action="processrequest" method="get" id="smsform">
+    <p class="form-item"><label class="label">Hash Number: </label><input type="text" name="number" id="hnum" value=""></p>
+    <p class="form-item"><label class="label">Switch1: </label>
+      <select name="s1">
+        <option value="on">On</option>
+        <option value="off">Off</option>
+      </select>
+    </p>
+    <p class="form-item"><label class="label">Switch2: </label>
+      <select name="s2">
+        <option value="on">On</option>
+        <option value="off">Off</option>
+      </select>
+    </p>
+    <p class="form-item"><label class="label">Switch3: </label>
+      <select name="s3">
+        <option value="on">On</option>
+        <option value="off">Off</option>
+      </select>
+    </p>
+    <p class="form-item"><label class="label">Switch4: </label>
+      <select name="s4">
+        <option value="on">On</option>
+        <option value="off">Off</option>
+      </select>
+    </p>
+    <p class="form-item"><label class="label">Fan: </label>
+      <select name="fan">
+        <option value="Forward">Forward</option>
+        <option value="Reverse">Reverse</option>
+      </select>
+    </p>
+    <p class="form-item"><label class="label">Heater: </label><input type="number" name="heater" max="200"></p>
+    <p class="form-item"><label class="label">Keypad: </label><input type="number" name="keypad" max="9999"></p>
+    <p class="form-item"><label class="label">Message: </label><input type="text" name="message"></p><br/>
+    <input name="feature" value="SendMessage" type="submit">
+  </form>
+</div>
 
-echo "<form action='processrequest' method='get'>
-Hash Number: <input type='text' name='number'><br>
-Message: <input type='text' name='message'><br>
-<input name='feature' value='display_messages' type='submit'>
-</form>";
-    
-  
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+  setInterval(function() {
+    if (window.XMLHttpRequest)
+      {// code for IE7+, Firefox, Chrome, Opera, Safari
+      xmlhttp=new XMLHttpRequest();
+      }
+    else
+      {// code for IE6, IE5
+      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+      }
+    xmlhttp.onreadystatechange=function()
+      {
+      if (xmlhttp.readyState==4 && xmlhttp.status==200)
+        {
 
+          // For the time now
+          Date.prototype.timeNow = function () {
+          return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
+}
+          var currentdate = new Date();
+          var datetime = currentdate.timeNow();
+          document.getElementById("smscontainer").innerHTML = this.responseText;
+          document.getElementById("page_meta").innerHTML = datetime;
+        }
+      }
+    xmlhttp.open("GET","templates/get_sms_updates.php",true);
+    xmlhttp.send();
+  }, 3000);
 
+</script>
 
-?>
+<script>
+function makeid()
+{
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 5; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
+  document.getElementById("hnum").value = makeid();
+
+</script>
+

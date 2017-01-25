@@ -1,51 +1,11 @@
 <?php
+  require_once 'C:\xampp\htdocs\sw\proj\myp\wrappers\WrapperMySQL.php';
+  require_once 'C:\xampp\htdocs\sw\proj\myp\wrappers\WrapperSQL.php';
+  require_once 'C:\xampp\htdocs\sw\proj\myp\wrappers\WrapperSoap.php';
 
-$obj_application->get('/processrequest', function() use ($obj_application)
-{
-  $f_class_path = $obj_application->config('classes.path');
-  $f_wrapper_path = $obj_application->config('wrappers.path');
-  $f_css_path = $obj_application->config('css.path');
-  $f_doc_root = $obj_application->config('docroot');
-  $f_arr_features = $obj_application->config('features');
-  $f_feature = $obj_application->request->get('feature');
-  $f_validated_feature = validation($f_feature, $f_class_path, $f_arr_features);
-
-  switch ($f_validated_feature)
-  {
-    case 'display_messages':
-      $arr_data = display_SMS_form($f_css_path, $f_doc_root, $f_wrapper_path, $f_class_path);
-      $feature = 'displaySMSmessages.php';
-      break;
-    case 'SendMessage':
-      $arr_data = display_SMS_form($f_css_path, $f_doc_root, $f_wrapper_path, $f_class_path);
-      $feature = 'displaySMSmessages.php';
-      break;
-    default:
-      $arr_data = feature_error();
-      $feature ='feature_error.php';
-  }
-
-  $obj_application->render($feature, $arr_data);
-
-});
-
-function validation($p_feature, $p_class_path, $p_arr_features)
-{
-  require_once $p_class_path . 'Validate.php';
-  $f_obj_validate = new Validate();
-
-  $f_validated_feature = $f_obj_validate->validate_feature($p_feature, $p_arr_features);
-  return $f_validated_feature;
-}
-
-function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_path)
-{
-  require_once $p_wrapper_path . 'WrapperSoap.php';
-  require_once $p_wrapper_path . 'WrapperMySQL.php';
-  require_once $p_wrapper_path . 'WrapperSQL.php';
-  require_once $p_class_path . 'SoapSMSModel.php';
-  require_once $p_class_path . 'XmlParser.php';
-  require_once $p_class_path . 'Validate.php';
+  require_once 'C:\xampp\htdocs\sw\proj\myp\classes\SoapSMSModel.php';
+  require_once 'C:\xampp\htdocs\sw\proj\myp\classes\XmlParser.php';
+  require_once 'C:\xampp\htdocs\sw\proj\myp\classes\Validate.php';
 
   $f_obj_soap_client_handle = null;
   $f_obj_soap_wrapper = new WrapperSoap();
@@ -61,11 +21,6 @@ function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_pa
   {
     $f_obj_download_details = new SoapSMSModel();
     $f_obj_download_details->set_soap_client_handle($f_obj_soap_client_handle);
-
-    if(isset($_GET['message'])) {
-        $f_obj_download_details->send_sms_message($_GET['number'], $_GET['s1'], $_GET['s2'], $_GET['s3'], $_GET['s4'], $_GET['fan'], $_GET['heater'], $_GET['keypad'], $_GET['message']);
-    }
-
 
     $f_arr_sms_messages = $f_obj_download_details->get_sms_messages();
     
@@ -89,8 +44,6 @@ function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_pa
         array_push($m_arr_parsed_sms_messages, $m_parsed_arr);
     }
 
-   
-
     foreach($m_arr_parsed_sms_messages as $f_arr_sms) {  // For each of the arrays
         if(strpos($f_arr_sms['message'], 'id":"llc') !== false) { // If the message contains ccl then
             $f_arr_sms['message'] = json_decode($f_arr_sms['message'], true);
@@ -98,12 +51,10 @@ function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_pa
                 if(strlen($f_arr_sms['message']['hashid']) == 5) {
                     array_push($f_arr_parsed_sms_messages, $f_arr_sms);  // Thats our message so push it onto our array
                 }
-                
             }
             
         }
     }
-
 
     $f_obj_mysql_wrapper = new WrapperMySQL();  //Setting up SQL Connections and wrapper
     $f_obj_sql_wrapper = new WrapperSQL();
@@ -133,6 +84,7 @@ function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_pa
                 }
             }
 
+
             $f_obj_mysql_wrapper->safe_query($f_obj_sql_wrapper->store_message(), $f_arr_sql_param);    // Insert our messages into the database using our new array of messages
         }
         
@@ -142,30 +94,35 @@ function display_SMS_form($p_css_path, $p_doc_root, $p_wrapper_path, $p_class_pa
     $f_message_record_set = $f_obj_mysql_wrapper->safe_fetch_array();
 
   }
-  $f_page_heading_2 = 'Showing download SMS messages';
-  $f_page_text  = '...';
+  echo "<table class='smstable'>
+  <tr>
+    <td>Source</td>
+    <td>Destination</td>
+    <td>Received</td>
+    <td>Bearer</td>
+    <td>Message Hash</td>
+    <td>Message ID</td>
+    <td>Switch 1</td>
+    <td>Switch 2</td>
+    <td>Switch 3</td>
+    <td>Switch 4</td>
+    <td>Fan</td>
+    <td>Heater</td>
+    <td>Keypad</td>
+    <td>UpdateMessage</td>
+  </tr>";
 
-  $f_css_file =  $p_css_path . CSS_NAME .'.css';
-  $f_application_name = APP_NAME;
+  foreach($f_message_record_set as $sms_arr)
+  { 
+    echo "<tr>";
 
-  $arr_data = [
-      'landing_page' => $p_doc_root,
-      'action' => 'processrequest',
-      'method' => 'get',
-      'css_filename' => $f_css_file,
-      'page_title' => $f_application_name,
-      'page_heading_1' => $f_application_name,
-      'page_heading_2' => $f_page_heading_2,
-      'page_text' => $f_page_text,
-      'sms_message' => $f_message_record_set
-  ];
+    foreach($sms_arr as $f_index => $f_value) {
 
-  return $arr_data;
-}
+      echo "<td>" . $f_value . "</td>";
+        
+    }
 
-function feature_error()
-{
-  $arr_data = [
-  ];
-  return $arr_data;
-}
+    echo "</tr>";
+  }
+echo "</table>";
+?>

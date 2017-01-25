@@ -23,7 +23,8 @@ $obj_application = new \Slim\Slim(array(
 		'css.path'	=>	$f_doc_root . DIRSEP . 'css' . DIRSEP,
 		'docroot' => $f_doc_root . DIRSEP,
 		'features' => [
-				'display_messages' => 'Display SMS Messages'
+				'display_messages' => 'Display SMS Messages',
+				'SendMessage' => 'Send SMS Message'
 		]
 ));
 

@@ -1,8 +1,21 @@
-html {margin:0;padding:0;border:0;}
+html {margin:0;padding:0;border:0;
+background-color: lightgrey;
+}
 
+#header {
+    text-align: center;
+}
+#content {
+    margin: 10px 30px;
+    text-align: center;
+}
+#footer {
+    text-align: center;
+}
 table.smstable {
     border: 1px solid black;
-
+    margin: 20px auto;
+    align-content: center;
 }
 
 table.smstable tr {
@@ -11,4 +24,10 @@ table.smstable tr {
 
 table.smstable td {
     border: 1px solid black;
+}
+.label {
+    margin-right: 20px;
+}
+.form-item {
+
 }
