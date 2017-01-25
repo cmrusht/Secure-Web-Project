@@ -1,4 +1,5 @@
 <?php
+  // Includes
   require_once '../wrappers/WrapperMySQL.php';
   require_once '../wrappers/WrapperSQL.php';
   require_once '../wrappers/WrapperSoap.php';
@@ -112,6 +113,7 @@
     <td>UpdateMessage</td>
   </tr>";
 
+  // For each of the elements in the array print it into the table
   foreach($f_message_record_set as $sms_arr)
   { 
     echo "<tr>";

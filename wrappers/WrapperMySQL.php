@@ -1,5 +1,7 @@
 <?php
-
+/*
+	Provides SQL connection and safe queries
+*/
 class WrapperMySQL
 {
 	private $c_obj_pdo;
@@ -13,8 +15,10 @@ class WrapperMySQL
 
 	public function __destruct() { }
 
+  // Sets up a new pdo connection to the database
 	public function connect_to_database()
 	{
+    // Get connection details
 		$m_arr_db_connection_details = $this->get_user_database_connection_details();
 		$m_user_name = $m_arr_db_connection_details['user_name'];
 		$m_user_password = $m_arr_db_connection_details['user_password'];
@@ -23,6 +27,7 @@ class WrapperMySQL
 		$this->c_obj_pdo = null;
 		try
 		{
+      // Connect to database
 			$this->c_obj_pdo = new PDO($m_host_details, $m_user_name, $m_user_password);
 			$this->c_obj_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
@@ -33,6 +38,7 @@ class WrapperMySQL
 		return $this->c_obj_pdo;
 	}
 
+  // Takes a query string and binds the values from the parameters to it and executes the string
 	public function safe_query($p_query_string, $p_arr_query_parameters = false)
 	{
 		$m_query_success = false;
@@ -40,9 +46,10 @@ class WrapperMySQL
 		{	
 			$m_temp = array();
 
+      // Prepare the string to be executed
 			$this->c_obj_stmt = $this->c_obj_pdo->prepare($p_query_string);
 
-			// bind the parameters
+			// bind the parameters if there are any
 			if (sizeof($p_arr_query_parameters) > 0 && $p_arr_query_parameters != NULL)
 			{
 				foreach ($p_arr_query_parameters as $m_param_key => $m_param_value)
@@ -55,6 +62,7 @@ class WrapperMySQL
 			// execute the query
 			$m_query_success = $this->c_obj_stmt->execute();
 		}
+    // Catch errors
 		catch (PDOException $exception_object)
 		{
 			$m_error_message  = 'PDO Exception caught. ';
@@ -68,18 +76,20 @@ class WrapperMySQL
 		return $m_query_success;
 	}
 
+  // Count number of rows in last query
 	public function count_rows()
 	{
 		$m_num_rows = $this->c_obj_stmt->rowCount();
 		return $m_num_rows;
 	}
 
+  // Fetch the row from the last query
 	public function safe_fetch_row()
 	{
 		$m_record_set = $this->c_obj_stmt->fetch(PDO::FETCH_NUM);
 		return $m_record_set;
 	}
-
+  // Fetch all the rows from the last query in an array
 	public function safe_fetch_array()
 	{
 		$m_arr_row = $this->c_obj_stmt->fetchall(PDO::FETCH_ASSOC);
@@ -87,16 +97,7 @@ class WrapperMySQL
 		return $m_arr_row;
 	}
 
-	public function last_inserted_ID()
-	{
-		$m_sql_query = 'SELECT LAST_INSERT_ID()';
-
-		$this->safe_query($m_sql_query);
-		$m_arr_last_inserted_id = $this->safe_fetch_array();
-		$m_last_inserted_id = $m_arr_last_inserted_id['LAST_INSERT_ID()'];
-		return $m_last_inserted_id;
-	}
-
+  // Setup user connection details to database
 	private function get_user_database_connection_details()
 	{
 		$m_rdbms = 'mysql';

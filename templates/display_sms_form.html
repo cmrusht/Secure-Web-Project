@@ -20,6 +20,7 @@
       <td>Update Message</td>
     </tr>";
 
+    // Print out each item of each array into the table
     foreach($sms_message as $sms_arr)
     { 
       echo "<tr>";
@@ -35,6 +36,7 @@
   echo "</table></div>";
   ?>
 
+  <!-- Form to send new messages -->
   <form action="processrequest" method="get" id="smsform">
     <p class="form-item"><label class="label">Hash Number: </label><input type="text" name="number" id="hnum" value=""></p>
     <p class="form-item"><label class="label">Switch1: </label>
@@ -74,33 +76,40 @@
   </form>
 </div>
 
-
+<!-- Jquery include -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script>
-  setInterval(function() {
-    if (window.XMLHttpRequest)
-      {// code for IE7+, Firefox, Chrome, Opera, Safari
-      xmlhttp=new XMLHttpRequest();
-      }
-    else
-      {// code for IE6, IE5
-      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-      }
-    xmlhttp.onreadystatechange=function()
-      {
-      if (xmlhttp.readyState==4 && xmlhttp.status==200)
-        {
 
-          // For the time now
-          Date.prototype.timeNow = function () {
-          return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
-}
-          var currentdate = new Date();
-          var datetime = currentdate.timeNow();
-          document.getElementById("smscontainer").innerHTML = this.responseText;
-          document.getElementById("page_meta").innerHTML = datetime;
-        }
+  // Time function to get current time
+  Date.prototype.timeNow = function () {
+    return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
+  }
+  // Execute function every 3 seconds
+  setInterval(function() 
+  {
+    if (window.XMLHttpRequest)
+    { // code for IE7+, Firefox, Chrome, Opera, Safari
+      xmlhttp=new XMLHttpRequest();
+    }
+    else
+    { // code for IE6, IE5
+      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange=function()
+    {
+      if (xmlhttp.readyState==4 && xmlhttp.status==200)
+      {
+        // Create new data variable
+        var currentdate = new Date();
+        // Set current time now
+        var datetime = currentdate.timeNow();
+        // Change the inner html of the div with the page we are getting
+        document.getElementById("smscontainer").innerHTML = this.responseText;
+        // Set the update time
+        document.getElementById("page_meta").innerHTML = datetime;
       }
+    }
+    // Retrieves the page in the background
     xmlhttp.open("GET","templates/get_sms_updates.php",true);
     xmlhttp.send();
   }, 3000);
@@ -108,16 +117,18 @@
 </script>
 
 <script>
-function makeid()
-{
+  // Returns a random 5 long alphanumeric string
+  function makeid()
+  {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     for( var i=0; i < 5; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
 
     return text;
-}
+  }
+  // Sets the textbox value to our string
   document.getElementById("hnum").value = makeid();
 
 </script>

@@ -1,11 +1,14 @@
 <?php
-
+/*
+  Contains sql queries
+*/
 class WrapperSQL
 {
   public function __construct(){}
 
   public function __destruct(){}
 
+  // Store messages sql query
   public function store_message()
   {
     $m_sql_query_string  = "INSERT INTO message (source, destination, received, bearer, message_hash, message_id, switch1, switch2, switch3, switch4, fan, heater, keypad, message)";
@@ -27,6 +30,7 @@ class WrapperSQL
     return $m_sql_query_string;
   }
 
+  // Get messages sql query
   public function get_message()
   {
     $m_sql_query_string  = "SELECT DISTINCT * FROM message ";
@@ -34,6 +38,7 @@ class WrapperSQL
     return $m_sql_query_string;
   }
 
+  // Check if a message is a duplicate in database query
   public function check_dupe_message($p_message_hash)
   {
     $m_sql_query_string  = "SELECT DISTINCT * FROM message ";
