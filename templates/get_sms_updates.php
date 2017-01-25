@@ -1,11 +1,11 @@
 <?php
-  require_once 'C:\xampp\htdocs\sw\proj\myp\wrappers\WrapperMySQL.php';
-  require_once 'C:\xampp\htdocs\sw\proj\myp\wrappers\WrapperSQL.php';
-  require_once 'C:\xampp\htdocs\sw\proj\myp\wrappers\WrapperSoap.php';
+  require_once '../wrappers/WrapperMySQL.php';
+  require_once '../wrappers/WrapperSQL.php';
+  require_once '../wrappers/WrapperSoap.php';
 
-  require_once 'C:\xampp\htdocs\sw\proj\myp\classes\SoapSMSModel.php';
-  require_once 'C:\xampp\htdocs\sw\proj\myp\classes\XmlParser.php';
-  require_once 'C:\xampp\htdocs\sw\proj\myp\classes\Validate.php';
+  require_once '../classes/SoapSMSModel.php';
+  require_once '../classes/XmlParser.php';
+  require_once '../classes/Validate.php';
 
   $f_obj_soap_client_handle = null;
   $f_obj_soap_wrapper = new WrapperSoap();
